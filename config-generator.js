@@ -1,5 +1,7 @@
 const { execSync } = require('child_process')
 const fs = require('fs')
+const { preprocessPackageJson } = require('./utils')
+const {VanillaJSConfigs, ReactConfigs, VueConfigs}  = require('./configurations')
 
 module.exports = class ConfigGenerator {
   constructor(framework, config) {
@@ -8,6 +10,8 @@ module.exports = class ConfigGenerator {
   }
 
   generate() {
+    preprocessPackageJson()
+
     switch (this.framework) {
       case '1. JavaScript':
         new VanillaConfigGenerator(this.config).generate()
@@ -32,44 +36,22 @@ class VanillaConfigGenerator {
   prettierConfig() {
     console.log('Initializing ESLint and Prettier setup...')
 
-    // Step 1: Install ESLint, Prettier, and relevant plugins
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended', 'plugin:prettier/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      rules: {
-        'prettier/prettier': 'error',
-      },
-    }
+    const eslintConfig = VanillaJSConfigs.EsLintWithPrettierConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Create Prettier configuration file
-    const prettierConfig = {
-      semi: true,
-      singleQuote: true,
-      trailingComma: 'es5',
-    }
+    const prettierConfig = VanillaJSConfigs.PrettierConfig
 
     console.log('Creating .prettierrc file...')
     fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
 
-    // Optional: Add an ignore file for ESLint and Prettier
     console.log('Creating .eslintignore and .prettierignore files...')
     const ignoreContent = 'node_modules\n'
     fs.writeFileSync('.eslintignore', ignoreContent)
@@ -81,7 +63,6 @@ class VanillaConfigGenerator {
   airBnbConfig() {
     console.log('Initializing ESLint with Airbnb configuration...')
 
-    // Step 1: Install ESLint and Airbnb config along with peer dependencies
     console.log('Installing dependencies...')
     execSync('npx install-peerdeps --dev eslint-config-airbnb-base', {
       stdio: 'inherit',
@@ -90,27 +71,11 @@ class VanillaConfigGenerator {
       stdio: 'inherit',
     })
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['airbnb-base'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      rules: {
-        // Add custom rules here, if needed
-      },
-    }
+    const eslintConfig = VanillaJSConfigs.EslintAirbnbConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Optionally create an ignore file
     console.log('Creating .eslintignore file...')
     const ignoreContent = 'node_modules\n'
     fs.writeFileSync('.eslintignore', ignoreContent)
@@ -121,34 +86,17 @@ class VanillaConfigGenerator {
   standardConfig() {
     console.log('Initializing ESLint with Standard configuration...')
 
-    // Step 1: Install ESLint and Standard config
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['standard'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      rules: {
-        // Add custom rules here if needed
-      },
-    }
+    const eslintConfig = VanillaJSConfigs.EslintStandardConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Optionally create an ignore file
     console.log('Creating .eslintignore file...')
     const ignoreContent = 'node_modules\n'
     fs.writeFileSync('.eslintignore', ignoreContent)
@@ -159,31 +107,14 @@ class VanillaConfigGenerator {
   errorPreventionConfig() {
     console.log('Initializing ESLint for error prevention only...')
 
-    // Step 1: Install ESLint
     console.log('Installing ESLint...')
     execSync('npm install --save-dev eslint', { stdio: 'inherit' })
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended'], // Uses only error prevention rules
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      rules: {
-        // Customize or override rules here if needed
-      },
-    }
+    const eslintConfig = VanillaJSConfigs.EslintWithErrorPreventionConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Optionally create an ignore file
     console.log('Creating .eslintignore file...')
     const ignoreContent = 'node_modules\n'
     fs.writeFileSync('.eslintignore', ignoreContent)
@@ -219,45 +150,22 @@ class ReactConfigGenerator {
   prettierConfig() {
     console.log('Initializing ESLint and Prettier setup for React...')
 
-    // Step 1: Install ESLint, Prettier, and React-specific plugins
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-react eslint-plugin-react-hooks',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:prettier/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['react', 'react-hooks'],
-      rules: {
-        'prettier/prettier': 'error',
-      },
-    }
+    const eslintConfig = ReactConfigs.EsLintWithPrettierConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Create Prettier configuration file
-    const prettierConfig = {
-      semi: true,
-      singleQuote: true,
-      trailingComma: 'es5',
-    }
+    const prettierConfig = ReactConfigs.PrettierConfig
 
     console.log('Creating .prettierrc file...')
     fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
 
-    // Optional: Add an ignore file for ESLint and Prettier
     console.log('Creating .eslintignore and .prettierignore files...')
     const ignoreContent = 'node_modules\n'
     fs.writeFileSync('.eslintignore', ignoreContent)
@@ -269,33 +177,18 @@ class ReactConfigGenerator {
   airBnbConfig() {
     console.log('Initializing ESLint with Airbnb configuration for React...')
 
-    // Step 1: Install Airbnb config with peer dependencies
     console.log('Installing dependencies...')
     execSync('npx install-peerdeps --dev eslint-config-airbnb', {
       stdio: 'inherit',
     })
-    execSync('npm install --save-dev eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks', {
-      stdio: 'inherit',
-    })
+    execSync(
+      'npm install --save-dev eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks',
+      {
+        stdio: 'inherit',
+      }
+    )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['airbnb', 'plugin:react/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['react', 'react-hooks'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
-
+    const eslintConfig = ReactConfigs.EslintAirbnbConfig
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
@@ -305,30 +198,13 @@ class ReactConfigGenerator {
   standardConfig() {
     console.log('Initializing ESLint with Standard configuration for React...')
 
-    // Step 1: Install Standard config
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-react eslint-plugin-react-hooks',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['standard', 'plugin:react/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['react', 'react-hooks'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
+    const eslintConfig = ReactConfigs.EslintStandardConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
@@ -339,27 +215,13 @@ class ReactConfigGenerator {
   errorPreventionConfig() {
     console.log('Initializing ESLint for error prevention only for React...')
 
-    // Step 1: Install ESLint
     console.log('Installing ESLint...')
-    execSync('npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks', { stdio: 'inherit' })
+    execSync(
+      'npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks',
+      { stdio: 'inherit' }
+    )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended', 'plugin:react/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['react', 'react-hooks'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
+    const eslintConfig = ReactConfigs.EslintWithErrorPreventionConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
@@ -387,7 +249,6 @@ class ReactConfigGenerator {
   }
 }
 
-
 class VueConfigGenerator {
   constructor(config) {
     this.config = config
@@ -396,40 +257,18 @@ class VueConfigGenerator {
   prettierConfig() {
     console.log('Initializing ESLint and Prettier setup for Vue...')
 
-    // Step 1: Install ESLint, Prettier, and Vue-specific plugins
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-vue',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended', 'plugin:vue/vue3-recommended', 'plugin:prettier/recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['vue'],
-      rules: {
-        'prettier/prettier': 'error',
-      },
-    }
+    const eslintConfig = VueConfigs.EsLintWithPrettierConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
-    // Step 3: Create Prettier configuration file
-    const prettierConfig = {
-      semi: true,
-      singleQuote: true,
-      trailingComma: 'es5',
-    }
+    const prettierConfig = VueConfigs.PrettierConfig
 
     console.log('Creating .prettierrc file...')
     fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
@@ -440,7 +279,6 @@ class VueConfigGenerator {
   airBnbConfig() {
     console.log('Initializing ESLint with Airbnb configuration for Vue...')
 
-    // Step 1: Install Airbnb config with peer dependencies
     console.log('Installing dependencies...')
     execSync('npx install-peerdeps --dev eslint-config-airbnb-base', {
       stdio: 'inherit',
@@ -449,23 +287,7 @@ class VueConfigGenerator {
       stdio: 'inherit',
     })
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['airbnb-base', 'plugin:vue/vue3-recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['vue'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
+    const eslintConfig = VueConfigs.EslintAirbnbConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
@@ -476,31 +298,13 @@ class VueConfigGenerator {
   standardConfig() {
     console.log('Initializing ESLint with Standard configuration for Vue...')
 
-    // Step 1: Install Standard config
     console.log('Installing dependencies...')
     execSync(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-vue eslint-plugin-import eslint-plugin-node eslint-plugin-promise',
       { stdio: 'inherit' }
     )
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['standard', 'plugin:vue/vue3-recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['vue'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
-
+    const eslintConfig = VueConfigs.EslintStandardConfig
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
@@ -510,74 +314,17 @@ class VueConfigGenerator {
   errorPreventionConfig() {
     console.log('Initializing ESLint for error prevention only for Vue...')
 
-    // Step 1: Install ESLint
     console.log('Installing ESLint...')
-    execSync('npm install --save-dev eslint eslint-plugin-vue', { stdio: 'inherit' })
+    execSync('npm install --save-dev eslint eslint-plugin-vue', {
+      stdio: 'inherit',
+    })
 
-    // Step 2: Create ESLint configuration file
-    const eslintConfig = {
-      env: {
-        browser: true,
-        es2021: true,
-        node: true,
-      },
-      extends: ['eslint:recommended', 'plugin:vue/vue3-recommended'],
-      parserOptions: {
-        ecmaVersion: 12,
-        sourceType: 'module',
-      },
-      plugins: ['vue'],
-      rules: {
-        // Add custom rules if needed
-      },
-    }
+    const eslintConfig = VueConfigs.EslintWithErrorPreventionConfig
 
     console.log('Creating .eslintrc.json file...')
     fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
 
     console.log('ESLint setup for error prevention only complete for Vue.')
-  }
-
-  generate() {
-    switch (this.config) {
-      case '1. ESLint + Prettier config':
-        this.prettierConfig()
-        break
-      case '2. ESLint + Airbnb config':
-        this.airBnbConfig()
-        break
-      case '3. ESLint + standard config':
-        this.standardConfig()
-        break
-      case '4. ESLint with error prevention only':
-        this.errorPreventionConfig()
-        break
-      default:
-        console.log('Invalid configuration choice')
-    }
-  }
-}
-
-
-class AngularConfigGenerator {
-  constructor(config) {
-    this.config = config
-  }
-
-  prettierConfig() {
-    console.log('Generating Prettier config...')
-  }
-
-  airBnbConfig() {
-    console.log('Generating Airbnb config...')
-  }
-
-  standardConfig() {
-    console.log('Generating standard config...')
-  }
-
-  errorPreventionConfig() {
-    console.log('Generating error prevention config...')
   }
 
   generate() {
