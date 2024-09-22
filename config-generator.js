@@ -1,17 +1,24 @@
-const { execSync } = require('child_process')
-const fs = require('fs')
-const { preprocessPackageJson } = require('./utils')
-const {VanillaJSConfigs, ReactConfigs, VueConfigs}  = require('./configurations')
+const {
+  preprocessPackageJson,
+  createEslintConfig,
+  createPrettierConfig,
+  installDependencies
+} = require('./utils')
+const {
+  VanillaJSConfigs,
+  ReactConfigs,
+  VueConfigs
+} = require('./configurations')
 
 module.exports = class ConfigGenerator {
-  constructor(framework, config) {
+  constructor (framework, config) {
     this.framework = framework
     this.config = config
   }
 
-  generate() {
+  generate () {
     preprocessPackageJson()
-
+    console.log('Initializing ESLint setup...')
     switch (this.framework) {
       case '1. JavaScript':
         new VanillaConfigGenerator(this.config).generate()
@@ -25,104 +32,47 @@ module.exports = class ConfigGenerator {
       default:
         console.log('Invalid framework choice')
     }
+
+    console.log('ESLint setup complete.')
   }
 }
 
 class VanillaConfigGenerator {
-  constructor(config) {
+  constructor (config) {
     this.config = config
   }
 
-  prettierConfig() {
-    console.log('Initializing ESLint and Prettier setup...')
-
-    console.log('Installing dependencies...')
-    execSync(
+  prettierConfig () {
+    installDependencies(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier',
       { stdio: 'inherit' }
     )
 
-    const eslintConfig = VanillaJSConfigs.EsLintWithPrettierConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    const prettierConfig = VanillaJSConfigs.PrettierConfig
-
-    console.log('Creating .prettierrc file...')
-    fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
-
-    console.log('Creating .eslintignore and .prettierignore files...')
-    const ignoreContent = 'node_modules\n'
-    fs.writeFileSync('.eslintignore', ignoreContent)
-    fs.writeFileSync('.prettierignore', ignoreContent)
-
-    console.log('ESLint and Prettier setup complete.')
+    createEslintConfig(VanillaJSConfigs.EsLintWithPrettierConfig)
+    createPrettierConfig(VanillaJSConfigs.PrettierConfig)
   }
 
-  airBnbConfig() {
-    console.log('Initializing ESLint with Airbnb configuration...')
-
-    console.log('Installing dependencies...')
-    execSync('npx install-peerdeps --dev eslint-config-airbnb-base', {
-      stdio: 'inherit',
-    })
-    execSync('npm install --save-dev eslint-plugin-import', {
-      stdio: 'inherit',
-    })
-
-    const eslintConfig = VanillaJSConfigs.EslintAirbnbConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('Creating .eslintignore file...')
-    const ignoreContent = 'node_modules\n'
-    fs.writeFileSync('.eslintignore', ignoreContent)
-
-    console.log('ESLint setup with Airbnb style guide complete.')
+  airBnbConfig () {
+    installDependencies('npm install --save-dev eslint eslint-config-airbnb-base eslint-plugin-import')
+    installDependencies('npm install globals @eslint/js @eslint/eslintrc')
+    createEslintConfig(VanillaJSConfigs.EslintAirbnbConfig)
   }
 
-  standardConfig() {
-    console.log('Initializing ESLint with Standard configuration...')
-
-    console.log('Installing dependencies...')
-    execSync(
-      'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise',
-      { stdio: 'inherit' }
+  standardConfig () {
+    installDependencies(
+      'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise'
     )
 
-    const eslintConfig = VanillaJSConfigs.EslintStandardConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('Creating .eslintignore file...')
-    const ignoreContent = 'node_modules\n'
-    fs.writeFileSync('.eslintignore', ignoreContent)
-
-    console.log('ESLint setup with Standard configuration complete.')
+    createEslintConfig(VanillaJSConfigs.EslintStandardConfig)
   }
 
-  errorPreventionConfig() {
-    console.log('Initializing ESLint for error prevention only...')
+  errorPreventionConfig () {
+    installDependencies('npm install --save-dev eslint')
 
-    console.log('Installing ESLint...')
-    execSync('npm install --save-dev eslint', { stdio: 'inherit' })
-
-    const eslintConfig = VanillaJSConfigs.EslintWithErrorPreventionConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('Creating .eslintignore file...')
-    const ignoreContent = 'node_modules\n'
-    fs.writeFileSync('.eslintignore', ignoreContent)
-
-    console.log('ESLint setup for error prevention only complete.')
+    createEslintConfig(VanillaJSConfigs.EslintWithErrorPreventionConfig)
   }
 
-  generate() {
+  generate () {
     switch (this.config) {
       case '1. ESLint + Prettier config':
         this.prettierConfig()
@@ -143,93 +93,41 @@ class VanillaConfigGenerator {
 }
 
 class ReactConfigGenerator {
-  constructor(config) {
+  constructor (config) {
     this.config = config
   }
 
-  prettierConfig() {
-    console.log('Initializing ESLint and Prettier setup for React...')
-
-    console.log('Installing dependencies...')
-    execSync(
-      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-react eslint-plugin-react-hooks',
-      { stdio: 'inherit' }
+  prettierConfig () {
+    installDependencies(
+      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
     )
-
-    const eslintConfig = ReactConfigs.EsLintWithPrettierConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    const prettierConfig = ReactConfigs.PrettierConfig
-
-    console.log('Creating .prettierrc file...')
-    fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
-
-    console.log('Creating .eslintignore and .prettierignore files...')
-    const ignoreContent = 'node_modules\n'
-    fs.writeFileSync('.eslintignore', ignoreContent)
-    fs.writeFileSync('.prettierignore', ignoreContent)
-
-    console.log('ESLint and Prettier setup complete for React.')
+    createEslintConfig(ReactConfigs.EsLintWithPrettierConfig)
+    createPrettierConfig(ReactConfigs.PrettierConfig)
   }
 
-  airBnbConfig() {
-    console.log('Initializing ESLint with Airbnb configuration for React...')
-
-    console.log('Installing dependencies...')
-    execSync('npx install-peerdeps --dev eslint-config-airbnb', {
-      stdio: 'inherit',
-    })
-    execSync(
-      'npm install --save-dev eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks',
-      {
-        stdio: 'inherit',
-      }
+  airBnbConfig () {
+    installDependencies('npx install-peerdeps --dev eslint-config-airbnb')
+    installDependencies(
+      'npm install --save-dev eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks'
     )
-
-    const eslintConfig = ReactConfigs.EslintAirbnbConfig
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup with Airbnb style guide complete for React.')
+    createEslintConfig(ReactConfigs.EslintAirbnbConfig)
   }
 
-  standardConfig() {
-    console.log('Initializing ESLint with Standard configuration for React...')
-
-    console.log('Installing dependencies...')
-    execSync(
-      'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-react eslint-plugin-react-hooks',
-      { stdio: 'inherit' }
+  standardConfig () {
+    installDependencies(
+      'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
     )
-
-    const eslintConfig = ReactConfigs.EslintStandardConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup with Standard configuration complete for React.')
+    createEslintConfig(ReactConfigs.EslintStandardConfig)
   }
 
-  errorPreventionConfig() {
-    console.log('Initializing ESLint for error prevention only for React...')
-
-    console.log('Installing ESLint...')
-    execSync(
-      'npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks',
-      { stdio: 'inherit' }
+  errorPreventionConfig () {
+    installDependencies(
+      'npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
     )
-
-    const eslintConfig = ReactConfigs.EslintWithErrorPreventionConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup for error prevention only complete for React.')
+    createEslintConfig(ReactConfigs.EslintWithErrorPreventionConfig)
   }
 
-  generate() {
+  generate () {
     switch (this.config) {
       case '1. ESLint + Prettier config':
         this.prettierConfig()
@@ -250,84 +148,39 @@ class ReactConfigGenerator {
 }
 
 class VueConfigGenerator {
-  constructor(config) {
+  constructor (config) {
     this.config = config
   }
 
-  prettierConfig() {
-    console.log('Initializing ESLint and Prettier setup for Vue...')
-
-    console.log('Installing dependencies...')
-    execSync(
-      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-vue',
-      { stdio: 'inherit' }
+  prettierConfig () {
+    installDependencies(
+      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-vue'
     )
-
-    const eslintConfig = VueConfigs.EsLintWithPrettierConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    const prettierConfig = VueConfigs.PrettierConfig
-
-    console.log('Creating .prettierrc file...')
-    fs.writeFileSync('.prettierrc', JSON.stringify(prettierConfig, null, 2))
-
-    console.log('ESLint and Prettier setup complete for Vue.')
+    createEslintConfig(VueConfigs.EsLintWithPrettierConfig)
+    createPrettierConfig(VueConfigs.PrettierConfig)
   }
 
-  airBnbConfig() {
-    console.log('Initializing ESLint with Airbnb configuration for Vue...')
-
-    console.log('Installing dependencies...')
-    execSync('npx install-peerdeps --dev eslint-config-airbnb-base', {
-      stdio: 'inherit',
-    })
-    execSync('npm install --save-dev eslint-plugin-vue eslint-plugin-import', {
-      stdio: 'inherit',
-    })
-
-    const eslintConfig = VueConfigs.EslintAirbnbConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup with Airbnb style guide complete for Vue.')
-  }
-
-  standardConfig() {
-    console.log('Initializing ESLint with Standard configuration for Vue...')
-
-    console.log('Installing dependencies...')
-    execSync(
-      'npm install --save-dev eslint eslint-config-standard eslint-plugin-vue eslint-plugin-import eslint-plugin-node eslint-plugin-promise',
-      { stdio: 'inherit' }
+  airBnbConfig () {
+    installDependencies('npx install-peerdeps --dev eslint-config-airbnb-base')
+    installDependencies(
+      'npm install --save-dev eslint-plugin-vue eslint-plugin-import'
     )
-
-    const eslintConfig = VueConfigs.EslintStandardConfig
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup with Standard configuration complete for Vue.')
+    createEslintConfig(VueConfigs.EslintAirbnbConfig)
   }
 
-  errorPreventionConfig() {
-    console.log('Initializing ESLint for error prevention only for Vue...')
-
-    console.log('Installing ESLint...')
-    execSync('npm install --save-dev eslint eslint-plugin-vue', {
-      stdio: 'inherit',
-    })
-
-    const eslintConfig = VueConfigs.EslintWithErrorPreventionConfig
-
-    console.log('Creating .eslintrc.json file...')
-    fs.writeFileSync('.eslintrc.json', JSON.stringify(eslintConfig, null, 2))
-
-    console.log('ESLint setup for error prevention only complete for Vue.')
+  standardConfig () {
+    installDependencies(
+      'npm install --save-dev eslint eslint-config-standard eslint-plugin-vue eslint-plugin-import eslint-plugin-node eslint-plugin-promise'
+    )
+    createEslintConfig(VueConfigs.EslintStandardConfig)
   }
 
-  generate() {
+  errorPreventionConfig () {
+    installDependencies('npm install --save-dev eslint eslint-plugin-vue')
+    createEslintConfig(VueConfigs.EslintWithErrorPreventionConfig)
+  }
+
+  generate () {
     switch (this.config) {
       case '1. ESLint + Prettier config':
         this.prettierConfig()
