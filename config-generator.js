@@ -2,200 +2,200 @@ const {
   preprocessPackageJson,
   createEslintConfig,
   createPrettierConfig,
-  installDependencies
-} = require('./utils')
+  installDependencies,
+} = require('./utils');
 const {
   VanillaJSConfigs,
   ReactConfigs,
-  VueConfigs
-} = require('./configurations')
+  VueConfigs,
+} = require('./configurations');
 
 module.exports = class ConfigGenerator {
-  constructor (framework, config) {
-    this.framework = framework
-    this.config = config
+  constructor(framework, config) {
+    this.framework = framework;
+    this.config = config;
   }
 
-  generate () {
-    preprocessPackageJson()
-    console.log('Initializing ESLint setup...')
+  generate() {
+    preprocessPackageJson();
+    console.log('Initializing ESLint setup...');
     switch (this.framework) {
       case '1. JavaScript':
-        new VanillaConfigGenerator(this.config).generate()
-        break
+        new VanillaConfigGenerator(this.config).generate();
+        break;
       case '2. React':
-        new ReactConfigGenerator(this.config).generate()
-        break
+        new ReactConfigGenerator(this.config).generate();
+        break;
       case '3. Vue':
-        new VueConfigGenerator(this.config).generate()
-        break
+        new VueConfigGenerator(this.config).generate();
+        break;
       default:
-        console.log('Invalid framework choice')
+        console.log('Invalid framework choice');
     }
 
-    console.log('ESLint setup complete.')
+    console.log('ESLint setup complete.');
   }
-}
+};
 
 class VanillaConfigGenerator {
-  constructor (config) {
-    this.config = config
+  constructor(config) {
+    this.config = config;
   }
 
-  prettierConfig () {
+  prettierConfig() {
     installDependencies(
-      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier',
-      { stdio: 'inherit' }
-    )
+      'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier'
+    );
 
-    createEslintConfig(VanillaJSConfigs.EsLintWithPrettierConfig)
-    createPrettierConfig(VanillaJSConfigs.PrettierConfig)
+    createEslintConfig(VanillaJSConfigs.EsLintWithPrettierConfig);
+    createPrettierConfig(VanillaJSConfigs.PrettierConfig);
   }
 
-  airBnbConfig () {
-    installDependencies('npm install --save-dev eslint eslint-config-airbnb-base eslint-plugin-import')
-    installDependencies('npm install globals @eslint/js @eslint/eslintrc')
-    createEslintConfig(VanillaJSConfigs.EslintAirbnbConfig)
+  airBnbConfig() {
+    installDependencies(
+      'npm install --save-dev eslint eslint-config-airbnb-base eslint-plugin-import'
+    );
+    installDependencies('npm install globals @eslint/js @eslint/eslintrc');
+    createEslintConfig(VanillaJSConfigs.EslintAirbnbConfig);
   }
 
-  standardConfig () {
+  standardConfig() {
     installDependencies(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise'
-    )
+    );
 
-    createEslintConfig(VanillaJSConfigs.EslintStandardConfig)
+    createEslintConfig(VanillaJSConfigs.EslintStandardConfig);
   }
 
-  errorPreventionConfig () {
-    installDependencies('npm install --save-dev eslint')
+  errorPreventionConfig() {
+    installDependencies('npm install --save-dev eslint');
 
-    createEslintConfig(VanillaJSConfigs.EslintWithErrorPreventionConfig)
+    createEslintConfig(VanillaJSConfigs.EslintWithErrorPreventionConfig);
   }
 
-  generate () {
+  generate() {
     switch (this.config) {
       case '1. ESLint + Prettier config':
-        this.prettierConfig()
-        break
+        this.prettierConfig();
+        break;
       case '2. ESLint + Airbnb config':
-        this.airBnbConfig()
-        break
+        this.airBnbConfig();
+        break;
       case '3. ESLint + standard config':
-        this.standardConfig()
-        break
+        this.standardConfig();
+        break;
       case '4. ESLint with error prevention only':
-        this.errorPreventionConfig()
-        break
+        this.errorPreventionConfig();
+        break;
       default:
-        console.log('Invalid configuration choice')
+        console.log('Invalid configuration choice');
     }
   }
 }
 
 class ReactConfigGenerator {
-  constructor (config) {
-    this.config = config
+  constructor(config) {
+    this.config = config;
   }
 
-  prettierConfig () {
+  prettierConfig() {
     installDependencies(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
-    )
-    createEslintConfig(ReactConfigs.EsLintWithPrettierConfig)
-    createPrettierConfig(ReactConfigs.PrettierConfig)
+    );
+    createEslintConfig(ReactConfigs.EsLintWithPrettierConfig);
+    createPrettierConfig(ReactConfigs.PrettierConfig);
   }
 
-  airBnbConfig () {
-    installDependencies('npx install-peerdeps --dev eslint-config-airbnb')
+  airBnbConfig() {
     installDependencies(
-      'npm install --save-dev eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks'
-    )
-    createEslintConfig(ReactConfigs.EslintAirbnbConfig)
+      'npm install --save-dev eslint eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-node @eslint/compat'
+    );
+    createEslintConfig(ReactConfigs.EslintAirbnbConfig);
   }
 
-  standardConfig () {
+  standardConfig() {
     installDependencies(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
-    )
-    createEslintConfig(ReactConfigs.EslintStandardConfig)
+    );
+    createEslintConfig(ReactConfigs.EslintStandardConfig);
   }
 
-  errorPreventionConfig () {
+  errorPreventionConfig() {
     installDependencies(
       'npm install --save-dev eslint eslint-plugin-react eslint-plugin-react-hooks @eslint/compat'
-    )
-    createEslintConfig(ReactConfigs.EslintWithErrorPreventionConfig)
+    );
+    createEslintConfig(ReactConfigs.EslintWithErrorPreventionConfig);
   }
 
-  generate () {
+  generate() {
     switch (this.config) {
       case '1. ESLint + Prettier config':
-        this.prettierConfig()
-        break
+        this.prettierConfig();
+        break;
       case '2. ESLint + Airbnb config':
-        this.airBnbConfig()
-        break
+        this.airBnbConfig();
+        break;
       case '3. ESLint + standard config':
-        this.standardConfig()
-        break
+        this.standardConfig();
+        break;
       case '4. ESLint with error prevention only':
-        this.errorPreventionConfig()
-        break
+        this.errorPreventionConfig();
+        break;
       default:
-        console.log('Invalid configuration choice')
+        console.log('Invalid configuration choice');
     }
   }
 }
 
 class VueConfigGenerator {
-  constructor (config) {
-    this.config = config
+  constructor(config) {
+    this.config = config;
   }
 
-  prettierConfig () {
+  prettierConfig() {
     installDependencies(
       'npm install --save-dev eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-vue'
-    )
-    createEslintConfig(VueConfigs.EsLintWithPrettierConfig)
-    createPrettierConfig(VueConfigs.PrettierConfig)
+    );
+    createEslintConfig(VueConfigs.EsLintWithPrettierConfig);
+    createPrettierConfig(VueConfigs.PrettierConfig);
   }
 
-  airBnbConfig () {
-    installDependencies('npx install-peerdeps --dev eslint-config-airbnb-base')
+  airBnbConfig() {
+    installDependencies('npm install globals @eslint/js @eslint/eslintrc');
     installDependencies(
-      'npm install --save-dev eslint-plugin-vue eslint-plugin-import'
-    )
-    createEslintConfig(VueConfigs.EslintAirbnbConfig)
+      'npm install --save-dev @vue/eslint-config-airbnb @rushstack/eslint-patch'
+    );
+    createEslintConfig(VueConfigs.EslintAirbnbConfig);
   }
 
-  standardConfig () {
+  standardConfig() {
     installDependencies(
       'npm install --save-dev eslint eslint-config-standard eslint-plugin-vue eslint-plugin-import eslint-plugin-node eslint-plugin-promise'
-    )
-    createEslintConfig(VueConfigs.EslintStandardConfig)
+    );
+    createEslintConfig(VueConfigs.EslintStandardConfig);
   }
 
-  errorPreventionConfig () {
-    installDependencies('npm install --save-dev eslint eslint-plugin-vue')
-    createEslintConfig(VueConfigs.EslintWithErrorPreventionConfig)
+  errorPreventionConfig() {
+    installDependencies('npm install --save-dev eslint eslint-plugin-vue');
+    createEslintConfig(VueConfigs.EslintWithErrorPreventionConfig);
   }
 
-  generate () {
+  generate() {
     switch (this.config) {
       case '1. ESLint + Prettier config':
-        this.prettierConfig()
-        break
+        this.prettierConfig();
+        break;
       case '2. ESLint + Airbnb config':
-        this.airBnbConfig()
-        break
+        this.airBnbConfig();
+        break;
       case '3. ESLint + standard config':
-        this.standardConfig()
-        break
+        this.standardConfig();
+        break;
       case '4. ESLint with error prevention only':
-        this.errorPreventionConfig()
-        break
+        this.errorPreventionConfig();
+        break;
       default:
-        console.log('Invalid configuration choice')
+        console.log('Invalid configuration choice');
     }
   }
 }
