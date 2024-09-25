@@ -1,8 +1,23 @@
 {
-  "name": "lint-it",
-  "version": "1.0.0",
+  "name": "lintomatic",
+  "version": "1.0.2",
   "main": "index.js",
+  "bin": {
+    "your-command": "index.js"
+  },
+  "contributors": [
+    {
+      "name": "Irtiza",
+      "email": "irtizahussain223@gmail.com"
+    },
+    {
+      "name": "Muhammad Shariq",
+      "email": "muhammadshariqsa@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/irtizahussain221/lint-it",
   "license": "MIT",
+  "private": false,
   "dependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.11.0",
